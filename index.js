@@ -1,4 +1,5 @@
 var fs = require('fs')
+var promisify = require('util').promisify
 var native = require('./build/Release/flock.node')
 
 function normalizeOptionsToMode (options) {
@@ -21,10 +22,14 @@ function normalizeOptionsToMode (options) {
 }
 
 module.exports.lock = lock
+module.exports.lockAsync = promisify(lock)
 function lock (path, options, callback) {
   if (typeof options === 'function') {
     callback = options
     options = null
+  }
+  if (typeof callback !== 'function') {
+    throw new TypeError('Expect argument callback of flock.lock to be a function')
   }
   var mode = normalizeOptionsToMode(options)
   fs.open(path, 'w', (err, fd) => {
@@ -44,10 +49,14 @@ function lock (path, options, callback) {
 }
 
 module.exports.upgrade = upgrade
+module.exports.upgradeAsync = promisify(upgrade)
 function upgrade (fd, options, callback) {
   if (typeof options === 'function') {
     callback = options
     options = null
+  }
+  if (typeof callback !== 'function') {
+    throw new TypeError('Expect argument callback of flock.upgrade to be a function')
   }
   var mode = normalizeOptionsToMode(options)
   native.flock(fd, mode, (ret) => {
@@ -61,7 +70,11 @@ function upgrade (fd, options, callback) {
 }
 
 module.exports.unlock = unlock
+module.exports.unlockAsync = promisify(unlock)
 function unlock (fd, callback) {
+  if (typeof callback !== 'function') {
+    throw new TypeError('Expect a function to be second argument of flock.unlock')
+  }
   native.flock(fd, native.LOCK_UN, (ret) => {
     if (ret !== 0) {
       var msg = native.stdErr(ret)
