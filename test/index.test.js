@@ -8,6 +8,7 @@ test('exclusive lock shall be exclusive', t => {
   var target = path.join(__dirname, `proc${++syn}.lock`)
   flock.lockAsync(target, { exclusive: true })
     .then(lock => {
+      t.strictEqual(typeof lock, 'number', 'lock shall be an fd')
       return flock.lockAsync(target, { exclusive: true })
         .then(() => {
           t.fail('not reachable path')
