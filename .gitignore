@@ -1,3 +1,8 @@
 node_modules
 build
 test/*.lock
+
+CMakeFiles
+CMakeCache.txt
+Makefile
+*.cmake

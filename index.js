@@ -1,6 +1,18 @@
 var fs = require('fs')
 var promisify = require('util').promisify
-var native = require('./build/Release/flock.node')
+var native = bindings(['./build/Release/flock.node', './flock.node'])
+
+function bindings (paths) {
+  for (var i = 0; i < paths.length; ++i) {
+    try {
+      return require(paths[i])
+    } catch (err) {
+      continue
+    }
+  }
+  throw new Error('Could not locate the bindings file. Tried:\n' +
+    paths.map(it => `  =>${it}`).join('\n'))
+}
 
 function normalizeOptionsToMode (options) {
   if (options == null) {
