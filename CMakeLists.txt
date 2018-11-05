@@ -5,6 +5,9 @@ set(CMAKE_CXX_STANDARD 11)
 add_library(node-flock MODULE flock.cc)
 if (CMAKE_INCLUDE_DIR)
   target_include_directories(node-flock PRIVATE
+    ${CMAKE_INCLUDE_DIR}
+    ${CMAKE_INCLUDE_DIR}/shadow-node
+    # the following needs to be moved to CMAKE_SYSROOT
     ${CMAKE_INCLUDE_DIR}/include
     ${CMAKE_INCLUDE_DIR}/usr/include
     ${CMAKE_INCLUDE_DIR}/usr/include/shadow-node
