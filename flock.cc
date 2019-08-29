@@ -16,7 +16,11 @@ typedef struct {
 
 void FlockExecute (napi_env env, void* data) {
   flock_execute_data_t* execute = (flock_execute_data_t*) data;
-  execute->ret = flock(execute->fd, execute->operation);
+  int ret = flock(execute->fd, execute->operation);
+  if (ret != 0) {
+    ret = errno;
+  }
+  execute->ret = ret;
 }
 
 void FlockComplete (napi_env env, napi_status status, void* data) {
@@ -29,10 +33,6 @@ void FlockComplete (napi_env env, napi_status status, void* data) {
   NAPI_CALL_RETURN_VOID(env, napi_get_reference_value(env, execute->callback_ref, &callback));
 
   int ret = execute->ret;
-  if (ret != 0) {
-    ret = errno;
-  }
-
   napi_value nval_ret;
   NAPI_CALL_RETURN_VOID(env, napi_create_int32(env, ret, &nval_ret));
 
