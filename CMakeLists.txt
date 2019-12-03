@@ -1,22 +1,25 @@
-cmake_minimum_required(VERSION 3.0)
-project(node-flock CXX)
+cmake_minimum_required(VERSION 3.6)
+project(flock CXX)
 set(CMAKE_CXX_STANDARD 11)
 
-add_library(node-flock MODULE flock.cc)
+add_library(${PROJECT_NAME} MODULE flock.cc)
+set_target_properties(${PROJECT_NAME} PROPERTIES PREFIX "" SUFFIX ".node")
+
+if(APPLE)
+  set_target_properties(${PROJECT_NAME} PROPERTIES
+                        LINK_FLAGS "-rdynamic -undefined dynamic_lookup")
+else()
+  set_target_properties(${PROJECT_NAME} PROPERTIES
+                        LINK_FLAGS "-rdynamic -Wl,--unresolved-symbols=ignore-all")
+endif()
+
 if (CMAKE_INCLUDE_DIR)
-  target_include_directories(node-flock PRIVATE
+  target_include_directories(${PROJECT_NAME} PRIVATE
     ${CMAKE_INCLUDE_DIR}/include
     ${CMAKE_INCLUDE_DIR}/usr/include
     ${CMAKE_INCLUDE_DIR}/usr/include/shadow-node
   )
 endif()
-
-target_link_libraries(node-flock iotjs)
-set_target_properties(node-flock PROPERTIES
-  PREFIX ""
-  SUFFIX ".node"
-  OUTPUT_NAME "flock"
-  LINK_FLAGS "-rdynamic")
 
 if (CMAKE_INSTALL_DIR)
   install(TARGETS node-flock DESTINATION ${CMAKE_INSTALL_DIR})
